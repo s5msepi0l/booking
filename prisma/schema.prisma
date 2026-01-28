@@ -1,0 +1,153 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String    @id
+  
+  name          String
+  email         String
+
+  role          Role      @default(USER)
+  bookings      Booking[]
+
+  emailVerified Boolean   @default(false)
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Hotel {
+  id            Int     @id @default(autoincrement())
+
+  name          String
+  description   String
+
+  address       String
+  city          String
+
+  images        String[]
+
+  amenities     Amenities[]
+
+  bookings      Booking[]
+  Price         String
+  
+  @@map("hotel")
+}
+
+model Booking {
+  id        Int       @id @default(autoincrement())
+
+  room_number String
+
+  hotelId     Int
+  hotel       Hotel     @relation(fields: [hotelId], references: [id])
+
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onUpdate: Cascade)
+
+  checkIn     DateTime 
+  checkOut    DateTime
+
+  createdAt   DateTime  @default(now())
+
+  status      BookingStatus @default(PENDING)
+
+  @@map("booking")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+enum Role {
+  USER
+  OWNER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CHECKED_IN
+  CHECKED_OUT
+  CANCELLED
+  NO_SHOW
+}
+
+enum Amenities {
+  POOL
+  SPA
+  SAUNA
+  WIFI
+  GYM
+  RESTAURANT
+  BREAKFAST
+  BAR
+  CAFE
+  ROOM_SERVICE
+  PARKING
+  SHOPPING
+  GOLF
+}
