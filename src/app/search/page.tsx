@@ -202,16 +202,40 @@ export default function Search() {
                     {filter.map((amenity, index) => (
                         <label key={index} 
                         className="border-none cursor-pointer text-lg font-mono flex items-center">
-                        <input
-                            className="
-                            cursor-pointer
-                            w-9 h-5 rounded-full focus:ring-slate-500 focus:ring-2"
-                            type="checkbox"
-                            value={amenity}
-                            checked={selectedAmenities.includes(amenity)}
-                            onChange={() => handleCheckboxChange(amenity)}
-                        />
-                        {amenity} ({hotelData.filter(hotel => hotel.amenities.includes(filterOptions[index])).length})
+                        
+                        {hotelData.filter(hotel =>
+                            hotel.amenities.includes(filterOptions[index])
+                            ).length > 0 ? (
+                            <>
+                                <input
+                                className="cursor-pointer w-9 h-5 rounded-full focus:ring-slate-500 focus:ring-2"
+                                type="checkbox"
+                                value={amenity}
+                                checked={selectedAmenities.includes(amenity)}
+                                onChange={() => handleCheckboxChange(amenity)}
+                                />
+                                <span>
+                                {amenity} (
+                                    {hotelData.filter(hotel =>
+                                        hotel.amenities.includes(filterOptions[index])
+                                    ).length}
+                                )
+                                </span>
+                            </>
+                            ) : <>
+                                <input
+                                    type="checkbox"
+                                    disabled={true}
+                                    className="accent-blue-400 rounded-2xl border-none cursor-not-allowed w-9 h-5"
+                                />
+                                    
+                                    <span className="text-muted-foreground">
+                                    {amenity}
+                                    </span>
+                                </>
+                            
+                            }
+                            
                         </label>
                     ))}
                     </form>
@@ -257,7 +281,11 @@ export default function Search() {
 
                                     <div>
                                         <strong>From</strong>
-                                        <p className="flex"><strong className="flex flex-row">{hotel.Price}<strong className="text-sm ml-1">EUR</strong></strong>/night </p>
+                                        <p className="flex mb-8"><strong className="flex flex-row">{hotel.Price}<strong className="text-sm ml-1">EUR</strong></strong>/night </p>
+
+                                        <Link href={"/"} className="text-xl font-mono font-bold bg-red-500 text-white p-3 pl-6 pr-6 rounded-full">
+                                            See room
+                                        </Link>
                                     </div>
                                 </div>
                             </div>
