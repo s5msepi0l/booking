@@ -2,6 +2,9 @@
 
 import Header from "@/components/header";
 import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useSearchParams, useRouter } from "next/navigation";
 
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
@@ -9,10 +12,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { InputGroup, InputGroupInput } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import { type DateRange } from "react-day-picker";
-
-import { AspectRatio } from "@/components/ui/aspect-ratio"
-import Image from "next/image";
-import Link from "next/link";
 
 const filterOptions = [
   "POOL",
@@ -36,6 +35,9 @@ interface Hotel {
 }
 
 export default function Search() {
+    const Router = useRouter();
+    const searchParams = useSearchParams();
+
     const [hotelData, setHotelData] = useState<Hotel[]>([]);
     const [filter, setFilter] = useState<string[]>([]);
 
@@ -50,9 +52,28 @@ export default function Search() {
 
     const submit = async(e: any) => {    
         e.preventDefault();
-        console.log("Search:", searchBar);
-        console.log("Date Range:", dateRange);
-        console.log("guest count: ", guests);
+        //console.log("Search:", searchBar);
+        //console.log("Date Range:", dateRange);
+        //console.log("guest count: ", guests);
+    }
+
+    const book = async(id: number) => {
+        const hotel = hotelData[id];
+
+        console.log("params: ", searchParams)
+        console.log(`hotel (${id}): ${hotel.id}`)
+
+        const params = new URLSearchParams();
+
+        const dateValue = searchParams.get("date");
+        params.set("date", dateValue && dateValue !== "" ? dateValue : "")
+    
+        const guest = searchParams.get("guests");
+        params.set("guests", guest && guest !== "" ? guest : "1")
+    
+        params.set("id", hotel.id);
+
+        Router.push(`/book?${params.toString()}`);
     }
 
     const handleCheckboxChange = (amenity: string) => {
@@ -69,7 +90,9 @@ export default function Search() {
 
     const refreshData = async() => {
         const params = new URLSearchParams();
+
         params.set("amenities", selectedAmenities.join(","));
+        params.set("city", searchBar);
 
         const response = await fetch(`/api/hotels?${params.toString()}`, {method: "GET"});
         const data = await response.json();
@@ -78,20 +101,45 @@ export default function Search() {
     }
 
     useEffect(() => {
-        console.log(selectedAmenities);
+        //console.log(selectedAmenities);
         refreshData();
-    }, [selectedAmenities])
+    }, [selectedAmenities, searchBar])
 
     useEffect(() => {
-  /*      (async () => {
+        const rawDate = searchParams.get("date");
+        console.log(rawDate);
 
-            const response = await fetch(`/api/hotels`, {method: "GET"});
-            const data = await response.json();
+        try {
+            const raw = searchParams.get("date");
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                setDateRange({
+                    from: new Date(parsed.from),
+                    to: new Date(parsed.to),
+                });
+            }
+        } catch {
+            const today = new Date();
 
-            console.log("hotel data: ", data);
-        })();
-*/
-        refreshData();
+            setDateRange({
+                from: today,
+                to: today
+            })
+        }
+
+        const search = searchParams.get("search");
+        if (search) {
+            setSearchBar(search);
+        } else {
+            setSearchBar("");
+        }
+
+        const guest = searchParams.get("guests");
+        if (guest) {
+            setGuests(guest);
+        } else {
+            setSearchBar("1");
+        }
 
         setFilter([
             "Pool",
@@ -108,6 +156,18 @@ export default function Search() {
             "Shopping",
             "Golf"
         ]);
+
+        (async() => {        
+            const params = new URLSearchParams();
+
+            params.set("amenities", selectedAmenities.join(","));
+            params.set("city", searchParams.get("search") ?? "");
+
+            const response = await fetch(`/api/hotels?${params.toString()}`, {method: "GET"});
+            const data = await response.json();
+            console.log("data: ", data.data);
+            setHotelData(data?.data);
+        })()
 
     }, [])
     
@@ -168,7 +228,7 @@ export default function Search() {
 
                     <div className="flex flex-col justify-center hover:bg-slate-100 p-2 rounded-lg">
                         <p className="text-sm font-semibold text-red-600">How many people are staying?</p>
-                        <Select required={true} onValueChange={setGuests}>
+                        <Select required={true} onValueChange={setGuests} value={guests}>
                         <SelectTrigger className="w-40 h-10 border-0 shadow-none hover:bg-slate-100">
                             <SelectValue placeholder="Amount of guests" />
                         </SelectTrigger>
@@ -191,7 +251,7 @@ export default function Search() {
             </div>
             <hr/>
 
-            <h1 className="font-sans text-3xl ml-48 mt-12">Helsinki 16 hotels</h1>
+            <h1 className="font-sans text-3xl ml-48 mt-12">{searchParams.get("search")} {hotelData.length.toString()} hotels</h1>
 
             <div className="flex  justify-center w-full mt-16 max-h-150">
                 <div className="p-8 rounded-xl mr-24">
@@ -226,6 +286,7 @@ export default function Search() {
                                 <input
                                     type="checkbox"
                                     disabled={true}
+                                    checked={false}
                                     className="accent-blue-400 rounded-2xl border-none cursor-not-allowed w-9 h-5"
                                 />
                                     
@@ -252,7 +313,7 @@ export default function Search() {
                                 flex
                         ">
                             <div className="shrink-0 h-full max-w-80">
-                                <Image src={hotel.images[0]} alt="hotel image" className="rounded-l-xl" width={1920} height={1080} style={{objectFit: "cover"}}/>
+                                <Image src={hotel.images[0]} alt="hotel image" className="rounded-l-xl" width={1920} height={1080} style={{objectFit: "cover", height: "100%"}}/>
                             </div>
 
                             <div className="flex">
@@ -283,9 +344,15 @@ export default function Search() {
                                         <strong>From</strong>
                                         <p className="flex mb-8"><strong className="flex flex-row">{hotel.Price}<strong className="text-sm ml-1">EUR</strong></strong>/night </p>
 
-                                        <Link href={"/"} className="text-xl font-mono font-bold bg-red-500 text-white p-3 pl-6 pr-6 rounded-full">
+                                        <button onClick={() => book(index)} className="
+                                        text-xl font-mono font-bold text-white
+                                        bg-red-500 hover:bg-red-700
+                                        p-3 pl-6 pr-6
+                                        rounded-full
+                                        cursor-pointer
+                                        ">
                                             See room
-                                        </Link>
+                                        </button>
                                     </div>
                                 </div>
                             </div>

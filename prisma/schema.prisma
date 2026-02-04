@@ -66,6 +66,8 @@ model Booking {
   checkIn     DateTime 
   checkOut    DateTime
 
+  guests      Int
+
   createdAt   DateTime  @default(now())
 
   status      BookingStatus @default(PENDING)

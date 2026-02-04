@@ -1,8 +1,9 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
+import Image from "next/image"; 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -12,6 +13,8 @@ import { type DateRange } from "react-day-picker";
 import Header from "@/components/header";
 
 export default function Home() {
+  const Router = useRouter();
+
   const [search, setSearch] = useState("");
   
   const [dateRange, setDateRange] = useState<DateRange | undefined>();
@@ -25,8 +28,22 @@ export default function Home() {
     console.log("Date Range:", dateRange);
     console.log("guest count: ", guests);
 
+    const params = new URLSearchParams();
     
+    params.set("search", search);
+    params.set("guests", guests);
 
+    params.set(
+      "date",
+      JSON.stringify({
+        from: dateRange?.from?.toISOString(),
+        to: dateRange?.to?.toISOString()
+      }
+    ));
+    
+    Router.push(`/search?${params.toString()}`);
+
+    console.log(params.toString());
   };
 
   return (

@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
 
     // Get query params
     const amenitiesParam = searchParams.get("amenities");
-    const nameParam = searchParams.get("name");
+    const cityParam = searchParams.get("city");
 
     // Convert amenities string to array and make all uppercase
     const amenities: string[] = amenitiesParam
@@ -22,9 +22,9 @@ export async function GET(req: NextRequest) {
         };
     }
 
-    if (nameParam && nameParam.trim() !== "") {
-        where.name = {
-            contains: nameParam,
+    if (cityParam && cityParam.trim() !== "") {
+        where.city = {
+            contains: cityParam,
             mode: "insensitive",
         };
     }
