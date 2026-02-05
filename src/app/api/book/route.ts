@@ -119,6 +119,8 @@ export async function UPDATE(req: NextRequest) {
 
     const { bookingId } = await req.json();
 
+    prisma.booking.fields.status
+
     const booking = prisma.booking.findUnique({
         where: {
             id: bookingId
