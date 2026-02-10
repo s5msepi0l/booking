@@ -11,7 +11,7 @@ export async function GET(
   
     const hotels = await prisma.hotel.findUnique({where: {id: Id}})
     console.log("hotel: ", hotelId);
-
+    
     return NextResponse.json({
         data: hotels
     })
