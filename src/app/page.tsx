@@ -52,11 +52,11 @@ export default function Home() {
 
       <div className="w-screen h-[50vh] relative">
         <Image
-          src="/bar.jpg"
+          src="/hotel.jpg"
           alt="bar"
           width={1920}
           height={1080}
-          style={{ objectFit: "cover", width: "100vw", height: "50vh" }}
+          style={{ objectFit: "cover", width: "100vw", height: "95vh"}}
           className="blur-out-2xl"
         />
         <div className="absolute inset-0 flex items-center justify-center">
@@ -77,7 +77,7 @@ export default function Home() {
 
               <div className="flex flex-col justify-center relative hover:bg-slate-100 p-2 rounded-lg">
                 <p
-                  className="text-sm font-semibold text-red-600 cursor-pointer"
+                  className="text-sm font-semibold text-red-600 cursor-pointer ml-8"
                   onClick={() => setCalendarOpen(!calendarOpen)}
                 >
                   Date
@@ -114,7 +114,7 @@ export default function Home() {
               <div className="flex flex-col justify-center hover:bg-slate-100 p-2 rounded-lg">
                 <p className="text-sm font-semibold text-red-600">How many people are staying?</p>
                 <Select required={true} onValueChange={setGuests}>
-                  <SelectTrigger className="w-40 h-10 border-0 shadow-none hover:bg-slate-100">
+                  <SelectTrigger className="w-45 h-10 border-0 shadow-none hover:bg-slate-100">
                     <SelectValue placeholder="Amount of guests" />
                   </SelectTrigger>
                   <SelectContent>
@@ -137,7 +137,6 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="p-8">Reviews...</div>
     </div>
   );
 }

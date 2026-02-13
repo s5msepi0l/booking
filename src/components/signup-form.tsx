@@ -20,6 +20,7 @@ import { authClient } from "@/lib/auth-client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
   const [wrongPassword, setWrongPassword] = useState(false);
@@ -73,7 +74,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           <FieldGroup>
             <Field>
               <FieldLabel htmlFor="name">Username</FieldLabel>
-              <Input id="name" name="name" type="text" placeholder="CharlieKirk67" required />
+              <Input id="name" name="name" type="text" placeholder="JaneDoe67" required />
             </Field>
             <Field>
               <FieldLabel htmlFor="email">Email</FieldLabel>
@@ -81,7 +82,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
                 id="email"
                 name="email"
                 type="email"
-                placeholder="m@example.com"
+                placeholder="jane.doe@example.com"
                 required
               />
 
@@ -102,11 +103,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               <Field>
                 {wrongPassword && <FieldDescription className="text-red-600 font-bold text-md">{errText}</FieldDescription>}
                 <Button className={wrongPassword ? "bg-red-400 ": ""} type="submit">Create Account</Button>
-                <Button variant="outline" type="button">
+                {/*<Button variant="outline" type="button">
                   Sign up with Github
-                </Button>
+                </Button>*/}
                 <FieldDescription className="px-6 text-center">
-                  Already have an account? <a onClick={() => router.push("/login")} href="#">Sign in</a>
+                  Already have an account? <Link href="/login"> Sign in</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

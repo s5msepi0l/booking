@@ -10,6 +10,14 @@ import { number } from "zod";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 
+import { Montserrat } from "next/font/google";
+
+const montserrat = Montserrat({
+    subsets: ["latin"],
+    weight: ["400", "500", "600", "700", "800"]
+})
+
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -105,12 +113,32 @@ export default function Dashboard() {
 
     }, [isPending])
 
-	/**<Image src={item.hotel?.images[0]} width={1920} height={1080} className="
-						
-					"/> */
-    if (bookings)
+	const cancel = async (id: number) => {
+		const response = await fetch("/api/book", {
+			method: "DELETE",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				bookingId: id
+			}),
+		});
+
+		const data = await response.json();
+
+		console.log(data);
+	}
+
+	if (bookings)
     return <div className="flex flex-col items-center gap-4 min-h-screen">
         <Header/>
+		<Card className="flex items-center w-2/3">
+		<div className={`grid grid-cols-3 w-4/6 font-light text-xl ${montserrat.className}`}>
+		<h1>Hotel name</h1>
+		<h1>Status</h1>
+		<h1>Date</h1>
+		</div>
+
 		{
 			bookings.map((booking, index) => (
 				<Card key={index} className="
@@ -156,20 +184,20 @@ export default function Dashboard() {
 
 								<DropdownMenuSeparator />
 
-								<DropdownMenuItem className="text-red-600 focus:text-red-600">
+								<DropdownMenuItem className="text-red-600 focus:text-red-600" onClick={() => cancel(booking.id)}>
 								Cancel booking
 								</DropdownMenuItem>
 							</DropdownMenuContent>
 						</DropdownMenu>
 						<h1>{new Date(booking.checkIn).toLocaleDateString("en-ca")}</h1>
 						<h1>{booking.status}</h1>
-						<h1>{booking.hotel.name}</h1>
+						<h1>{booking.hotel?.name}</h1>
 					</div>
 					
 					<CardFooter className="flex flex-row w-full gap-8">
 						{booking.hotel!.amenities.map((item, index) => (
 							<Badge variant="outline" key={index} className="flex flex-row items-center justify-center w-32 h-6">
-								<Image src={`/amenities/${item}.png`} width={18} height={18} className="max-w-5" alt="wifi"/>
+								<Image src={`/amenities/${item}.png`} width={18} height={18} className="max-w-5 dark:invert" alt="wifi"/>
 								<h1 className="text-sm text-muted-foreground">{item}</h1>
 								
 							</Badge>
@@ -178,5 +206,6 @@ export default function Dashboard() {
 				</Card>
 			))
 		}
+		</Card>
     </div>
 }

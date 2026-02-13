@@ -24,6 +24,7 @@ import { github } from "better-auth";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export function LoginForm({
   className,
@@ -113,17 +114,14 @@ export function LoginForm({
                 {loginErr && <FieldError>{errText}</FieldError>}
                 <Button className={loginErr ? "bg-red-400 hover:bg-red-500": ""} type="submit">Login</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account? <a href="#">Sign up</a>
+                  Don&apos;t have an account? <Link href="/signup">Sign up</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
           </form>
         </CardContent>
       </Card>
-      <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
-        and <a href="#">Privacy Policy</a>.
-      </FieldDescription>
+
     </div>
   )
 }

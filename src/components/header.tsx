@@ -2,36 +2,48 @@
 
 import { authClient } from "@/lib/auth-client";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Button } from "./ui/button";
+import { useRouter } from "next/navigation";
 
 export default function Header() {
-    const { data: session, isPending } = authClient.useSession();
+    const { data: session } = authClient.useSession();
+    const router = useRouter();
 
-    const [auth, setAuth] = useState(false);
+    const signOut = async () => {
+        await authClient.signOut();
+        router.refresh();
+        router.replace("/");
+    };
 
-    /* Check user auth then display either login prompts or a link to dashboard
-    */
-    useEffect(() => {
-        if (isPending) return;
+    return (
+        <header className="w-screen h-14 flex justify-between items-center bg-slate-800 text-background dark:text-foreground dark:bg-slate-900 border-b-2 border-slate-950 px-8 font-sans">
+            <Link href="/" className="text-2xl">Hotel Finder</Link>
 
-        if (!session?.user) 
-            return
-
-        setAuth(true);
-    }, [isPending]);
-
-    return (<header className="w-screen h-14 flex justify-between items-center bg-slate-800 text-background dark:text-foreground dark:bg-slate-900 border-b-2 border-slate-950 px-8 font-sans">
-        <Link href="/" className="text-2xl">Hotel Finder</Link>
-        <div className="text-xl flex gap-4">
-            {auth ? 
-                <>
-                    <Link href="/dashboard" className="">Dashboard</Link>
-                </>:
-                <>
-                    <Link href="/login" className="font-semibold p-1 pl-3 pr-3 bg-slate-100 text-slate-900 rounded-2xl">Login</Link>
-                    <Link href="/signup" className="font-semibold p-1 pl-3 pr-3 bg-slate-100 text-slate-900 rounded-2xl">Sign up</Link>
-                </>
-            }
-        </div>
-    </header>)
+            <div className="text-xl flex gap-4">
+                {session?.user ? (
+                    <>
+                        <Button onClick={signOut}>
+                            Sign out
+                        </Button>
+                        <Button asChild>
+                            <Link href="/dashboard">Dashboard</Link>
+                        </Button>
+                    </>
+                ) : (
+                    <>
+                        <Button asChild>
+                            <Link href="/login" className="font-semibold">
+                                Login
+                            </Link>
+                        </Button>
+                        <Button asChild>
+                            <Link href="/signup" className="font-semibold">
+                                Sign up
+                            </Link>
+                        </Button>
+                    </>
+                )}
+            </div>
+        </header>
+    );
 }
